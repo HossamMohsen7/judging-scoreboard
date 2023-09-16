@@ -1,4 +1,4 @@
-import { getAllFormsDetails, getForms } from "@/utils/typeform";
+import { getAllFormsDetails } from "@/lib/typeform";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
