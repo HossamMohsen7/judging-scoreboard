@@ -1,20 +1,14 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import CompetitionCard from "@/containers/CompetitionCard";
-import { getAllFormsDetails } from "@/lib/typeform";
-import ky from "ky";
-import Image from "next/image";
+import TeamCard from "@/containers/TeamCard";
+import { getCompetitionDetail } from "@/lib/typeform";
 import { cookies } from "next/headers";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
-export default async function Scoreboard() {
-  const forms = await getAllFormsDetails();
+export default async function CompetitionDetails({
+  params,
+}: {
+  params: { id: string };
+}) {
   const c = cookies();
   if (!c.has("pwd")) {
     redirect("/");
@@ -24,6 +18,7 @@ export default async function Scoreboard() {
     redirect("/");
   }
 
+  const data = await getCompetitionDetail(params.id);
   return (
     <main className="flex min-h-[90vh] flex-col items-center justify-center p-24">
       <div className="flex flex-col items-center justify-center">
@@ -35,13 +30,21 @@ export default async function Scoreboard() {
           className="mb-8"
         />
         <h1 className="pb-10 text-center text-4xl font-bold">
-          Welcome to IEEE Victoris 2.0 Judging Dashboard
+          IEEE Victoris 2.0 Judging Dashboard
         </h1>
-        <h1 className="mb-6 text-center text-4xl font-bold">Competition:</h1>
+        <h1 className="mb-6 pb-6 text-center text-4xl font-bold">
+          {data.title} Teams:
+        </h1>
       </div>
       <div className="grid gap-7 md:grid-cols-1 lg:grid-cols-3">
-        {forms.map((form) => (
-          <CompetitionCard form={form} key={form.id} />
+        {data.teams.map((team) => (
+          <TeamCard
+            team={team}
+            criteria={data.criterias}
+            position={data.teams.indexOf(team) + 1}
+            key={team.id}
+            judges={data.numberOfJudges}
+          />
         ))}
       </div>
     </main>

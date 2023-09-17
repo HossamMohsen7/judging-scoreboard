@@ -1,8 +1,18 @@
+import { NextResponse } from "next/server";
+
 export async function POST(request: Request) {
   const password = (await request.json()).password;
-  if (password === "password") {
-    return new Response("ok", { status: 200 });
+  if (password === process.env.PASSWORD) {
+    const res = NextResponse.json({ success: true }, { status: 200 });
+    res.cookies.set({
+      name: "pwd",
+      value: password,
+      maxAge: 60 * 60 * 24,
+      httpOnly: true,
+      sameSite: "strict",
+    });
+    return res;
   } else {
-    return new Response("ko", { status: 401 });
+    return NextResponse.json({ success: false }, { status: 401 });
   }
 }
