@@ -36,13 +36,17 @@ export default function TeamCard({
         {criteria.map((c) => (
           <p className="py-3" key={c.id}>
             <strong>{c.title}:</strong>{" "}
-            <span className="text-xl">{team.averageByCriteria[c.id]}</span>
+            <span className="text-xl">
+              {team.averageByCriteria[c.id].toPrecision(3)}
+            </span>
             <span className="text-muted-foreground">/{c.max}</span>
           </p>
         ))}
         <p>{/* {form.teamsCount} Teams & {form.numberOfJudges} Judges */}</p>
       </CardContent>
-      <CardFooter className="text-lg">Score: {team.score}</CardFooter>
+      <CardFooter className="text-lg">
+        Score: {team.score.toPrecision(3)}
+      </CardFooter>
     </Card>
   );
 }

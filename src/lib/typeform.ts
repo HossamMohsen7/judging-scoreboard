@@ -63,28 +63,41 @@ export const getCompetitionDetail = async (id: string) => {
 
   const criterias: Criteria[] = [];
   const groups = form.fields!.filter((field) => field.type === "group");
+
+  const additionalScoreName = "Additional Score";
+  let additionalScoreId = "";
+
   groups.forEach((group) => {
     const ratings = group!.properties!.fields!.filter(
       (field: any) => field.type === "rating",
     );
-    ratings.forEach((rating: any) => {
-      criterias.push({
-        id: rating.id,
-        title: rating.title.replaceAll("*", ""),
-        max: rating?.properties?.steps,
+    ratings
+      .filter((r: any) => r.title !== additionalScoreName)
+      .forEach((rating: any) => {
+        criterias.push({
+          id: rating.id,
+          title: rating.title.replaceAll("*", ""),
+          max: rating?.properties?.steps,
+        });
       });
-    });
 
     const numbers = group!.properties!.fields!.filter(
       (field: any) => field.type === "number",
     );
-    numbers.forEach((number: any) => {
-      criterias.push({
-        id: number.id,
-        title: (number.title as string).replaceAll("*", ""),
-        max: number?.validations?.max_value,
+
+    additionalScoreId = (
+      numbers.find((n: any) => n.title === additionalScoreName) as any
+    ).id;
+
+    numbers
+      .filter((r: any) => r.title !== additionalScoreName)
+      .forEach((number: any) => {
+        criterias.push({
+          id: number.id,
+          title: (number.title as string).replaceAll("*", ""),
+          max: number?.validations?.max_value,
+        });
       });
-    });
   });
 
   const teams: Team[] = [];
@@ -103,6 +116,7 @@ export const getCompetitionDetail = async (id: string) => {
     pageSize: 750,
   });
 
+  let additonalScores: { [key: string]: number } = {};
   responses.items.forEach((item) => {
     const at = item.submitted_at!;
     const judgeName = item.hidden!.judge;
@@ -118,12 +132,23 @@ export const getCompetitionDetail = async (id: string) => {
       scores[c.id] = response;
     });
 
-    //check if has same judge but older date
-    const oldResponse = team!.responses.find(
-      (response) => response.judge === judgeName && response.at < at,
+    const additonalScore = item.answers!.find(
+      (answer) => answer.field!.id === additionalScoreId,
+    )?.number;
+
+    if (additonalScore) {
+      additonalScores[teamId] = additonalScore;
+    }
+
+    //check if judge is duplicated, only take the newest response
+    const judgeResponse = team!.responses.find(
+      (response) => response.judge === judgeName,
     );
-    if (oldResponse) {
-      const index = team!.responses.indexOf(oldResponse);
+    if (judgeResponse) {
+      if (judgeResponse.at > at) {
+        return;
+      }
+      const index = team!.responses.indexOf(judgeResponse);
       team!.responses.splice(index, 1);
     }
 
@@ -162,7 +187,7 @@ export const getCompetitionDetail = async (id: string) => {
       (sum, value) => sum + value,
       0,
     );
-    team.score = sum;
+    team.score = sum + additonalScores[team.id];
   }
 
   teams.sort((a, b) => b.score - a.score);
