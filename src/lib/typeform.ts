@@ -187,10 +187,13 @@ export const getCompetitionDetail = async (id: string) => {
       (sum, value) => sum + value,
       0,
     );
+
+console.log(additionalScores);
     team.score = sum + additonalScores[team.id];
   }
 
   teams.sort((a, b) => b.score - a.score);
+console.log(teams);
   return {
     id,
     imageUrl: data.imageUrl,
