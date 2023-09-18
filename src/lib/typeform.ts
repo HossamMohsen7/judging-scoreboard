@@ -188,7 +188,7 @@ export const getCompetitionDetail = async (id: string) => {
       0,
     );
 
-console.log(additionalScores);
+console.log(additonalScores);
     team.score = sum + additonalScores[team.id];
   }
 
