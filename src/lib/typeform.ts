@@ -189,7 +189,7 @@ export const getCompetitionDetail = async (id: string) => {
     );
 
 console.log(additonalScores);
-    team.score = sum + additonalScores[team.id];
+    team.score = sum + 0;
   }
 
   teams.sort((a, b) => b.score - a.score);
