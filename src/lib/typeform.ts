@@ -65,9 +65,10 @@ export const getCompetitionDetail = async (id: string) => {
   const groups = form.fields!.filter((field) => field.type === "group");
 
   const additionalScoreName = "Additional Score";
-  let additionalScoreId = "";
+  let additionalScoreId: string | undefined = undefined;
 
   groups.forEach((group) => {
+    console.log(group.properties?.fields);
     const ratings = group!.properties!.fields!.filter(
       (field: any) => field.type === "rating",
     );
@@ -85,9 +86,14 @@ export const getCompetitionDetail = async (id: string) => {
       (field: any) => field.type === "number",
     );
 
-    additionalScoreId = (
-      numbers.find((n: any) => n.title === additionalScoreName) as any
-    ).id;
+    console.log(numbers.map((n: any) => n.title));
+
+    const additionalField = numbers.find(
+      (n: any) => n.title === additionalScoreName,
+    );
+    if (additionalField) {
+      additionalScoreId = (additionalField as any).id;
+    }
 
     numbers
       .filter((r: any) => r.title !== additionalScoreName)
@@ -116,7 +122,7 @@ export const getCompetitionDetail = async (id: string) => {
     pageSize: 750,
   });
 
-  let additonalScores: { [key: string]: number } = {};
+  let additionalScores: { [key: string]: number } = {};
   responses.items.forEach((item) => {
     const at = item.submitted_at!;
     const judgeName = item.hidden!.judge;
@@ -132,12 +138,14 @@ export const getCompetitionDetail = async (id: string) => {
       scores[c.id] = response;
     });
 
-    const additonalScore = item.answers!.find(
-      (answer) => answer.field!.id === additionalScoreId,
-    )?.number;
+    if (additionalScoreId) {
+      const additonalScore = item.answers!.find(
+        (answer) => answer.field!.id === additionalScoreId,
+      )?.number;
 
-    if (additonalScore) {
-      additonalScores[teamId] = additonalScore;
+      if (additonalScore) {
+        additionalScores[teamId] = additonalScore;
+      }
     }
 
     //check if judge is duplicated, only take the newest response
@@ -188,12 +196,15 @@ export const getCompetitionDetail = async (id: string) => {
       0,
     );
 
-console.log(additonalScores);
-    team.score = sum + 0;
+    console.log(additionalScores);
+    team.score = sum;
+    if (additionalScoreId && additionalScores[team.id]) {
+      team.score += additionalScores[team.id];
+    }
   }
 
   teams.sort((a, b) => b.score - a.score);
-console.log(teams);
+  console.log(teams);
   return {
     id,
     imageUrl: data.imageUrl,
