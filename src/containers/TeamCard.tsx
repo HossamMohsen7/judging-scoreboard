@@ -42,6 +42,12 @@ export default function TeamCard({
             <span className="text-muted-foreground">/{c.max}</span>
           </p>
         ))}
+        <p className="py-3">
+            <strong>Additional Score:</strong>{" "}
+            <span className="text-xl">
+              {team.additionalScore.toPrecision(3)}
+            </span>
+          </p>
         <p>{/* {form.teamsCount} Teams & {form.numberOfJudges} Judges */}</p>
       </CardContent>
       <CardFooter className="text-lg">

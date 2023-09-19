@@ -23,6 +23,7 @@ interface Team {
   average: number;
   score: number;
   averageByCriteria: { [criteriaId: string]: number };
+  additionalScore: number;
 }
 
 interface Criteria {

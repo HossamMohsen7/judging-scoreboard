@@ -115,6 +115,7 @@ export const getCompetitionDetail = async (id: string) => {
       average: 0,
       score: 0,
       averageByCriteria: {},
+      additionalScore: 0
     }),
   );
   const responses = await typeformAPI.responses.list({
@@ -185,7 +186,7 @@ export const getCompetitionDetail = async (id: string) => {
         continue;
       }
       criteriaAverage[criteria.id] =
-        criteriaTotal[criteria.id] / team.responses.length;
+        criteriaTotal[criteria.id] / data.numberOfJudges;
     }
 
     team.averageByCriteria = criteriaAverage;
@@ -200,6 +201,7 @@ export const getCompetitionDetail = async (id: string) => {
     team.score = sum;
     if (additionalScoreId && additionalScores[team.id]) {
       team.score += additionalScores[team.id];
+      team.additionalScore = additionalScores[team.id];
     }
   }
 
