@@ -192,12 +192,18 @@ export const getCompetitionDetail = async (id: string) => {
       }
 
 
-      if(criteria.groupName.includes("MAZE")) {
-        criteriaAverage[criteria.id] = criteriaTotal[criteria.id] /2;
+      if(isMicromouse) {
+        if(criteria.groupName.includes("MAZE")) {
+          criteriaAverage[criteria.id] = criteriaTotal[criteria.id] /2;
+        } else {
+          criteriaAverage[criteria.id] =
+          criteriaTotal[criteria.id] / 6;
+        }
       } else {
         criteriaAverage[criteria.id] =
-        criteriaTotal[criteria.id] / 6;
+          criteriaTotal[criteria.id] / data.numberOfJudges;
       }
+      
       
     }
 
