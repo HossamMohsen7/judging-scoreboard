@@ -120,7 +120,7 @@ export const getCompetitionDetail = async (id: string) => {
       score: 0,
       averageByCriteria: {},
       additionalScore: 0,
-      maxScore: criterias.map(c => c.max).reduce((prev, curr) => prev + curr)
+      maxScore: isMicromouse ? 100 : criterias.map(c => c.max).reduce((prev, curr) => prev + curr)
     }),
   );
   const responses = await typeformAPI.responses.list({
@@ -191,11 +191,12 @@ export const getCompetitionDetail = async (id: string) => {
         continue;
       }
 
+
       if(criteria.groupName.includes("MAZE")) {
-        criteriaAverage[criteria.id] = criteriaTotal[criteria.id];
+        criteriaAverage[criteria.id] = criteriaTotal[criteria.id] /2;
       } else {
         criteriaAverage[criteria.id] =
-        criteriaTotal[criteria.id] / data.numberOfJudges;
+        criteriaTotal[criteria.id] / 6;
       }
       
     }
