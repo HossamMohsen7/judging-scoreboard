@@ -61,6 +61,8 @@ export const getCompetitionDetail = async (id: string) => {
   const data = await getCompetitionData(id);
   const form = await typeformAPI.forms.get({ uid: id });
 
+  const isMicromouse = id === "LL2KVKnA";
+
   const criterias: Criteria[] = [];
   const groups = form.fields!.filter((field) => field.type === "group");
 
@@ -79,6 +81,7 @@ export const getCompetitionDetail = async (id: string) => {
           id: rating.id,
           title: rating.title.replaceAll("*", ""),
           max: rating?.properties?.steps,
+          groupName: group.title!,
         });
       });
 
@@ -86,7 +89,7 @@ export const getCompetitionDetail = async (id: string) => {
       (field: any) => field.type === "number",
     );
 
-    console.log(numbers.map((n: any) => n.title));
+    
 
     const additionalField = numbers.find(
       (n: any) => n.title === additionalScoreName,
@@ -102,6 +105,7 @@ export const getCompetitionDetail = async (id: string) => {
           id: number.id,
           title: (number.title as string).replaceAll("*", ""),
           max: number?.validations?.max_value,
+          groupName: group.title!
         });
       });
   });
@@ -115,7 +119,8 @@ export const getCompetitionDetail = async (id: string) => {
       average: 0,
       score: 0,
       averageByCriteria: {},
-      additionalScore: 0
+      additionalScore: 0,
+      maxScore: criterias.map(c => c.max).reduce((prev, curr) => prev + curr)
     }),
   );
   const responses = await typeformAPI.responses.list({
@@ -185,19 +190,30 @@ export const getCompetitionDetail = async (id: string) => {
         criteriaAverage[criteria.id] = 0;
         continue;
       }
-      criteriaAverage[criteria.id] =
+
+      if(criteria.title.includes("SOFTWARE")) {
+        criteriaAverage[criteria.id] = criteriaTotal[criteria.id];
+      } else {
+        criteriaAverage[criteria.id] =
         criteriaTotal[criteria.id] / data.numberOfJudges;
+      }
+      
     }
 
     team.averageByCriteria = criteriaAverage;
 
     //sum
-    const sum = Object.values(criteriaAverage).reduce(
-      (sum, value) => sum + value,
-      0,
-    );
+    let sum = 0;
 
-    console.log(additionalScores);
+
+      sum = Object.values(criteriaAverage).reduce(
+        (sum, value) => sum + value,
+        0,
+      );
+ 
+    
+
+    
     team.score = sum;
     if (additionalScoreId && additionalScores[team.id]) {
       team.score += additionalScores[team.id];
@@ -206,7 +222,7 @@ export const getCompetitionDetail = async (id: string) => {
   }
 
   teams.sort((a, b) => b.score - a.score);
-  console.log(teams);
+  console.log(criterias);
   return {
     id,
     imageUrl: data.imageUrl,

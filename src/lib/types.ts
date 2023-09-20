@@ -24,12 +24,14 @@ interface Team {
   score: number;
   averageByCriteria: { [criteriaId: string]: number };
   additionalScore: number;
+  maxScore: number;
 }
 
 interface Criteria {
   id: string;
   title: string;
   max: number;
+  groupName: string;
 }
 
 interface TeamResponse {

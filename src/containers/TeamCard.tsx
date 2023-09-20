@@ -51,7 +51,7 @@ export default function TeamCard({
         <p>{/* {form.teamsCount} Teams & {form.numberOfJudges} Judges */}</p>
       </CardContent>
       <CardFooter className="text-lg">
-        Score: {team.score.toPrecision(3)}
+        Score: {team.score.toPrecision(3)}/{team.maxScore} = {((team.score / team.maxScore) * 100).toPrecision(3)}%
       </CardFooter>
     </Card>
   );
