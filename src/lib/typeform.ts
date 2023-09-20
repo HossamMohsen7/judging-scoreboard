@@ -191,7 +191,7 @@ export const getCompetitionDetail = async (id: string) => {
         continue;
       }
 
-      if(criteria.title.includes("SOFTWARE")) {
+      if(criteria.title.includes("MAZE")) {
         criteriaAverage[criteria.id] = criteriaTotal[criteria.id];
       } else {
         criteriaAverage[criteria.id] =
