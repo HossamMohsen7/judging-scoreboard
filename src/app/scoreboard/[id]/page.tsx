@@ -1,4 +1,5 @@
 import TeamCard from "@/containers/TeamCard";
+import { env } from "@/lib/env.mjs";
 import { getCompetitionDetail } from "@/lib/typeform";
 import { cookies } from "next/headers";
 import Image from "next/image";
@@ -14,7 +15,7 @@ export default async function CompetitionDetails({
     redirect("/");
   }
 
-  if (c.get("pwd")?.value !== process.env.PASSWORD) {
+  if (c.get("pwd")?.value !== env.PASSWORD) {
     redirect("/");
   }
 
@@ -23,14 +24,14 @@ export default async function CompetitionDetails({
     <main className="flex min-h-[90vh] flex-col items-center justify-center p-24">
       <div className="flex flex-col items-center justify-center">
         <Image
-          src="/white_logo.png"
+          src={env.NEXT_PUBLIC_LOGO_URL}
           alt="logo"
           width={400}
           height={400}
           className="mb-8"
         />
         <h1 className="pb-10 text-center text-4xl font-bold">
-          IEEE Victoris 2.0 Judging Dashboard
+          {env.NEXT_PUBLIC_TITLE} Judging Dashboard
         </h1>
         <h1 className="mb-6 pb-6 text-center text-4xl font-bold">
           {data.title} Teams:

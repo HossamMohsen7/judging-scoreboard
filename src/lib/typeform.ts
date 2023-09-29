@@ -1,22 +1,21 @@
 import { Typeform, createClient } from "@typeform/api-client";
+import { env } from "./env.mjs";
 
 const competitionData: { [index: string]: Competition } = {};
 const formsIdentifiers: { [key: string]: string } = {};
 const typeformAPI = createClient({
-  token: process.env.TYPEFORM_PERSONAL_TOKEN,
+  token: env.TYPEFORM_PERSONAL_TOKEN,
 });
 
 // Get Forms IDs from forms Identifiers if exist, else get from typeform
 export const getForms = async () => {
-  if (Object.keys(formsIdentifiers).length === 0) {
-    const forms = await typeformAPI.forms.list({
-      pageSize: 100,
-      workspaceId: process.env.TYPEFORM_WORKSPACE_ID,
-    });
-    forms.items.forEach((form) => {
-      formsIdentifiers[form.id] = form.title;
-    });
-  }
+  const forms = await typeformAPI.forms.list({
+    pageSize: 100,
+    workspaceId: env.TYPEFORM_WORKSPACE_ID,
+  });
+  forms.items.forEach((form) => {
+    formsIdentifiers[form.id] = form.title;
+  });
   return Object.keys(formsIdentifiers);
 };
 
@@ -89,8 +88,6 @@ export const getCompetitionDetail = async (id: string) => {
       (field: any) => field.type === "number",
     );
 
-    
-
     const additionalField = numbers.find(
       (n: any) => n.title === additionalScoreName,
     );
@@ -105,7 +102,7 @@ export const getCompetitionDetail = async (id: string) => {
           id: number.id,
           title: (number.title as string).replaceAll("*", ""),
           max: number?.validations?.max_value,
-          groupName: group.title!
+          groupName: group.title!,
         });
       });
   });
@@ -120,7 +117,9 @@ export const getCompetitionDetail = async (id: string) => {
       score: 0,
       averageByCriteria: {},
       additionalScore: 0,
-      maxScore: isMicromouse ? 100 : criterias.map(c => c.max).reduce((prev, curr) => prev + curr)
+      maxScore: isMicromouse
+        ? 100
+        : criterias.map((c) => c.max).reduce((prev, curr) => prev + curr),
     }),
   );
   const responses = await typeformAPI.responses.list({
@@ -191,20 +190,16 @@ export const getCompetitionDetail = async (id: string) => {
         continue;
       }
 
-
-      if(isMicromouse) {
-        if(criteria.groupName.includes("MAZE")) {
-          criteriaAverage[criteria.id] = criteriaTotal[criteria.id] /2;
+      if (isMicromouse) {
+        if (criteria.groupName.includes("MAZE")) {
+          criteriaAverage[criteria.id] = criteriaTotal[criteria.id] / 2;
         } else {
-          criteriaAverage[criteria.id] =
-          criteriaTotal[criteria.id] / 6;
+          criteriaAverage[criteria.id] = criteriaTotal[criteria.id] / 6;
         }
       } else {
         criteriaAverage[criteria.id] =
           criteriaTotal[criteria.id] / data.numberOfJudges;
       }
-      
-      
     }
 
     team.averageByCriteria = criteriaAverage;
@@ -212,15 +207,8 @@ export const getCompetitionDetail = async (id: string) => {
     //sum
     let sum = 0;
 
+    sum = Object.values(criteriaAverage).reduce((sum, value) => sum + value, 0);
 
-      sum = Object.values(criteriaAverage).reduce(
-        (sum, value) => sum + value,
-        0,
-      );
- 
-    
-
-    
     team.score = sum;
     if (additionalScoreId && additionalScores[team.id]) {
       team.score += additionalScores[team.id];

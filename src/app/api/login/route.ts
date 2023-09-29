@@ -1,8 +1,9 @@
+import { env } from "@/lib/env.mjs";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const password = (await request.json()).password;
-  if (password === process.env.PASSWORD) {
+  if (password === env.PASSWORD) {
     const res = NextResponse.json({ success: true }, { status: 200 });
     res.cookies.set({
       name: "pwd",

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { env } from "@/lib/env.mjs";
 import ky from "ky";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -55,14 +56,14 @@ export default function Home() {
     <main className="flex min-h-[90vh] flex-col items-center justify-center p-24">
       <div className="flex flex-col items-center justify-center">
         <Image
-          src="/white_logo.png"
+          src={env.NEXT_PUBLIC_LOGO_URL}
           alt="logo"
           width={400}
           height={400}
           className="mb-8"
         />
         <h1 className="mb-4 text-center text-4xl font-bold">
-          Welcome to IEEE Victoris 2.0 Judging Dashboard
+          Welcome to {env.NEXT_PUBLIC_TITLE} Judging Dashboard
         </h1>
         <p className="mb-8 text-center text-xl">Please enter your password</p>
         <p className="mb-4 text-center text-red-500">{error}</p>
