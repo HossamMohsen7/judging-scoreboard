@@ -1,3 +1,4 @@
+import { env } from "@/lib/env.mjs";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
@@ -5,8 +6,8 @@ import { Cairo } from "next/font/google";
 const cairo = Cairo({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "IEEE Victoris 2.0 Judging",
-  description: "Judging dashboard for IEEE Victoris 2.0",
+  title: `${env.NEXT_PUBLIC_TITLE} Judging`,
+  description: `Judging dashboard for ${env.NEXT_PUBLIC_TITLE}`,
 };
 
 export default function RootLayout({

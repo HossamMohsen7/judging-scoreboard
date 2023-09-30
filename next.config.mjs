@@ -3,7 +3,14 @@ import "./src/lib/env.mjs";
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-  images: { domains: ["images.typeform.com", "ieeemansb.org"] },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
