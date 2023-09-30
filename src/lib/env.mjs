@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    DATABASE_URL: z.string().url(),
+    DATABASE_URL: z.string().url().default("file:./dev.db"),
     TYPEFORM_PERSONAL_TOKEN: z.string().min(1),
     TYPEFORM_WORKSPACE_ID: z.string().min(1),
     PASSWORD: z.string().min(1),

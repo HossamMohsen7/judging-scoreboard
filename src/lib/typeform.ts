@@ -1,11 +1,13 @@
 import { Typeform, createClient } from "@typeform/api-client";
 import { env } from "./env.mjs";
+import { Type } from "lucide-react";
 
 const competitionData: { [index: string]: Competition } = {};
 const formsIdentifiers: { [key: string]: string } = {};
 const typeformAPI = createClient({
   token: env.TYPEFORM_PERSONAL_TOKEN,
 });
+const additionalScoreName = "Additional Score";
 
 // Get Forms IDs from forms Identifiers if exist, else get from typeform
 export const getForms = async () => {
@@ -33,17 +35,19 @@ const getTeamsNames = (form: Typeform.Form) => {
   }, []);
 };
 
+const getCompetitionDataFromForm = (form: Typeform.Form) => {
+  return {
+    id: form.id!,
+    title: form.title!,
+    imageUrl: form.settings?.meta?.image?.href,
+    teamsCount: getTeamsNames(form).length,
+    numberOfJudges: (form.variables as any).noofjudge ?? 0,
+  };
+};
+
 const getCompetitionData = async (formId: string) => {
-  if (!competitionData[formId]) {
-    const form = await typeformAPI.forms.get({ uid: formId });
-    competitionData[formId] = {
-      id: formId,
-      title: form.title!,
-      imageUrl: form.settings?.meta?.image?.href,
-      teamsCount: getTeamsNames(form).length,
-      numberOfJudges: (form.variables as any).noofjudge ?? 0,
-    };
-  }
+  const form = await typeformAPI.forms.get({ uid: formId });
+  competitionData[formId] = getCompetitionDataFromForm(form);
 
   return competitionData[formId];
 };
@@ -57,19 +61,17 @@ export const getAllFormsDetails = async () => {
 };
 
 export const getCompetitionDetail = async (id: string) => {
-  const data = await getCompetitionData(id);
   const form = await typeformAPI.forms.get({ uid: id });
+  const data = getCompetitionDataFromForm(form);
 
   const isMicromouse = id === "LL2KVKnA";
 
   const criterias: Criteria[] = [];
   const groups = form.fields!.filter((field) => field.type === "group");
 
-  const additionalScoreName = "Additional Score";
   let additionalScoreId: string | undefined = undefined;
 
   groups.forEach((group) => {
-    console.log(group.properties?.fields);
     const ratings = group!.properties!.fields!.filter(
       (field: any) => field.type === "rating",
     );
@@ -204,10 +206,10 @@ export const getCompetitionDetail = async (id: string) => {
 
     team.averageByCriteria = criteriaAverage;
 
-    //sum
-    let sum = 0;
-
-    sum = Object.values(criteriaAverage).reduce((sum, value) => sum + value, 0);
+    const sum = Object.values(criteriaAverage).reduce(
+      (sum, value) => sum + value,
+      0,
+    );
 
     team.score = sum;
     if (additionalScoreId && additionalScores[team.id]) {
@@ -216,8 +218,8 @@ export const getCompetitionDetail = async (id: string) => {
     }
   }
 
+  //Sort teams by score (highest first)
   teams.sort((a, b) => b.score - a.score);
-  console.log(criterias);
   return {
     id,
     imageUrl: data.imageUrl,

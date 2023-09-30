@@ -53,8 +53,11 @@ export default function TeamCard({
         </p>
         <p>{/* {form.teamsCount} Teams & {form.numberOfJudges} Judges */}</p>
       </CardContent>
-      <CardFooter className="text-lg">
-        Score: {team.score.toPrecision(env.NEXT_PUBLIC_UI_PRECISION)}
+      <CardFooter className="text-center text-lg">
+        Score:&nbsp;
+        <span className="text-xl">
+          {team.score.toPrecision(env.NEXT_PUBLIC_UI_PRECISION)}
+        </span>
         <span className="text-muted-foreground">/{team.maxScore}</span>
         <span>
           &nbsp;
