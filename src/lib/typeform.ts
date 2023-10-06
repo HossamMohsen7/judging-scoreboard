@@ -57,6 +57,9 @@ export const getAllFormsDetails = async () => {
   const responses = await Promise.all(
     formsIds.map((formId) => getCompetitionData(formId)),
   );
+  responses.sort((a, b) =>
+    a.title.localeCompare(b.title, undefined, { numeric: true }),
+  );
   return responses;
 };
 
